@@ -1,0 +1,4 @@
+# 줄바꿈을 LF로 통일 (Windows에서도 파일 내용이 바뀌지 않게)
+* text=auto eol=lf
+*.png binary
+*.jpg binary

@@ -1,0 +1,9 @@
+# 운영체제·편집기가 만드는 파일
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+.vscode/
+
+# Claude Code 개인 설정 (공유용 .claude/launch.json은 포함)
+.claude/settings.local.json
