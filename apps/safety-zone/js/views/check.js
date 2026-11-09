@@ -1,4 +1,5 @@
 import { get, set } from '../store.js';
+import { AUTO_ORG_MEMO } from '../data/duties.js';
 import {
   INDUSTRIES, industryLabel, SERIOUS_ACCIDENT_DEFINITION, PENALTY_SUMMARY, DISCLAIMER_FULL
 } from '../data/legal.js';
@@ -71,8 +72,6 @@ function priorities(profile, result) {
   list.push('반기 1회 이상 점검 항목 일정 잡기', '매일 TBM 기록 남기기');
   return list;
 }
-
-const AUTO_ORG_MEMO = '자가진단 결과에 따라 자동 표시 (규모 기준은 원문 확인)';
 
 function markOrgNa(org) {
   if (org.status !== 'todo' || org.memo) return null;

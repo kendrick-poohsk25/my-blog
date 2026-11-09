@@ -115,7 +115,7 @@ function importPanel(draft, measuresEl, rerender) {
   const candidates = riskCandidates();
   const panel = h('details', { class: 'examples' }, h('summary', { text: '위험성평가에서 불러오기' }));
   if (!candidates.length) {
-    panel.append(h('p', { class: 'muted small' }, '불러올 위험요인이 없습니다. ', h('a', { href: '#/risk', text: '위험성평가 작성하기' })));
+    panel.append(h('p', { class: 'muted small' }, '불러올 위험요인이 없습니다. ', h('a', { class: 'touch-link', href: '#/risk', text: '위험성평가 작성하기' })));
     return panel;
   }
   panel.append(h('ul', { class: 'pick-list' }, candidates.map(({ risk, row, level }) => h('li', {},

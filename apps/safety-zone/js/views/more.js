@@ -33,7 +33,7 @@ function dutyReport() {
   const rows = DUTIES.map((duty) => {
     const state = dutyState(duties, duty.id);
     const due = nextDue(duty, state);
-    const dueText = due ? `${due}${isOverdue(duty, state, today) ? ' (기한 지남)' : ''}` : (duty.semiannual ? '-' : '반기 점검 대상 아님');
+    const dueText = due ? `${due}${isOverdue(duty, state, today) ? ' (기한 지남)' : ''}` : (duty.semiannual ? '점검일 미입력' : '반기 점검 대상 아님');
     return [String(duty.no), duty.title, statusInfo(state.status).label, state.lastCheckedAt || '', dueText, state.memo, duty.basis];
   });
   return {

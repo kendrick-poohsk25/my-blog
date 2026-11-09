@@ -1,5 +1,5 @@
 import { get, set } from '../store.js';
-import { DUTIES, STATUSES, statusInfo, findDuty } from '../data/duties.js';
+import { DUTIES, STATUSES, statusInfo, findDuty, AUTO_ORG_MEMO } from '../data/duties.js';
 import { h, pageHead, field, choiceGroup, badge, progressBar, uid } from '../utils/dom.js';
 import { addMonths, todayStr, nowIso } from '../utils/date.js';
 
@@ -106,7 +106,11 @@ export function renderDuties(root) {
 function saveDuty(id, patch) {
   const duties = get('duties');
   const next = { ...dutyState(duties, id), ...patch };
-  if ('status' in patch) delete next.autoNa;
+  // 사용자가 상태를 직접 바꾸면 자동 표시를 풀고, 손대지 않은 자동 메모도 함께 지웁니다.
+  if ('status' in patch && next.autoNa) {
+    delete next.autoNa;
+    if (next.memo === AUTO_ORG_MEMO) next.memo = '';
+  }
   duties.items[id] = next;
   duties.updatedAt = nowIso();
   set('duties', duties);
@@ -147,11 +151,14 @@ export function renderDutyDetail(root, { id }) {
   const state = dutyState(get('duties'), id);
   const due = dueOutput(duty, state);
   const hint = savedHint();
+  let memo = null;
   const persist = (patch) => {
-    due.update(saveDuty(id, patch));
+    const saved = saveDuty(id, patch);
+    due.update(saved);
+    if (memo && memo.value !== saved.memo) memo.value = saved.memo;
     hint.textContent = '저장했습니다.';
   };
-  const memo = h('textarea', { rows: '3', value: state.memo, onInput: (e) => persist({ memo: e.target.value }) });
+  memo = h('textarea', { rows: '3', value: state.memo, onInput: (e) => persist({ memo: e.target.value }) });
   const checked = h('input', { type: 'date', value: state.lastCheckedAt || '', max: todayStr(), onChange: (e) => persist({ lastCheckedAt: e.target.value || null }) });
   root.append(
     pageHead(`${duty.no}. ${duty.title}`, '#/duties', '목록'),

@@ -87,6 +87,9 @@ export const DUTIES = [
 
 export const DUTY_IDS = DUTIES.map((duty) => duty.id);
 
+// 자가진단이 전담 조직 항목에 자동으로 넣는 메모입니다. 자동 표시를 풀 때 이 문구와 같으면 지웁니다.
+export const AUTO_ORG_MEMO = '자가진단 결과에 따라 자동 표시 (규모 기준은 원문 확인)';
+
 export const STATUSES = [
   { value: 'todo', label: '미착수', icon: '○', tone: 'muted' },
   { value: 'in_progress', label: '진행 중', icon: '◐', tone: 'warn' },
