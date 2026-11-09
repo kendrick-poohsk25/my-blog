@@ -10,6 +10,7 @@
   <script>
     // 화면이 그려지기 전에 테마를 정해 깜빡임(FOUC)을 막습니다.
     (() => {
+      // 앱 설정이 '기기 설정 따르기'면 블로그의 theme 키를 먼저 보고, 없으면 OS 설정을 따릅니다.
       let theme = 'system';
       try {
         const raw = localStorage.getItem('sz:settings');
@@ -20,11 +21,20 @@
         theme = 'system';
       }
       if (theme === 'system') {
+        try {
+          const blog = localStorage.getItem('theme');
+          if (blog === 'light' || blog === 'dark') theme = blog;
+        } catch (e) {
+          theme = 'system';
+        }
+      }
+      if (theme === 'system') {
         theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.dataset.theme = theme;
     })();
   </script>
+  <link rel="stylesheet" href="../../css/tokens.css">
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/print.css" media="print">
   <script type="module" src="js/main.js"></script>

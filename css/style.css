@@ -1,39 +1,9 @@
 /* ========== 테마 ========== */
+/* 색상·글꼴·모서리 변수는 css/tokens.css에 있다. 여기에는 레이아웃 변수만 둔다. */
 :root {
-  color-scheme: light;
-  --bg: #fcfcfb;
-  --surface: #f4f4f1;
-  --text: #1d2125;
-  --text-muted: #5a616b;
-  --border: #e3e3df;
-  --accent: #1f5bd8;
-  --accent-soft: rgb(31 91 216 / 0.1);
-  --code-bg: #f2f2ee;
-  --code-text: #23282e;
-  --header-bg: rgb(252 252 251 / 0.86);
-  --selection: rgb(31 91 216 / 0.18);
-
-  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "D2Coding", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --measure: 720px;
   --gutter: 16px;
-  --radius: 8px;
   --header-height: 60px;
-}
-
-[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #17191d;
-  --surface: #1f2228;
-  --text: #e3e5e9;
-  --text-muted: #9aa1ac;
-  --border: #2e323a;
-  --accent: #7cafff;
-  --accent-soft: rgb(124 175 255 / 0.14);
-  --code-bg: #20242b;
-  --code-text: #d7dce3;
-  --header-bg: rgb(23 25 29 / 0.86);
-  --selection: rgb(124 175 255 / 0.28);
 }
 
 /* ========== 기본 ========== */

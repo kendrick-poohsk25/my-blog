@@ -257,3 +257,181 @@
 - 위 항목은 1·2차와 같은 이유로 이번에도 확인하지 못했음.
 
 테스트 데이터(`sz:*`)는 모두 지웠고 뷰포트는 desktop으로 되돌림.
+
+# 4차 검증 — 공통 색상 토큰·사용법 안내
+
+> 2026-11-09 · 대상: `briefs/tokens.md`에 따른 수정. `css/tokens.css`(새 파일), `css/style.css`, 블로그 `index.html`, 앱 `index.html`·`css/app.css`·`css/print.css`·`assets/icon.svg`·`js/theme.js`·`js/views/home.js`·`js/views/more.js`·`js/data/guide.js`(새 파일).
+> - 확인 방식: 이미 떠 있는 `http://localhost:8123/`을 headless Edge(157)로 열고, `--remote-debugging-port` + node(CDP) 스크립트로 계산된 스타일·DOM·콘솔·네트워크를 확인함. 화면은 스크린샷으로 확인함.
+> - 대비는 계산된 글자색과, 조상 요소 배경을 반투명까지 합성한 실제 배경색으로 WCAG 공식에 따라 계산함.
+> - 코드 파일은 고치지 않았고, git은 `git show`/`git diff`만 사용함.
+
+## 판정: **통과 (낮음·중간 2건 기록)**
+
+확인 항목 7개 모두 기준을 충족함. 출시를 막는 문제는 없음. 아래 2건과 참고 1건은 다음 수정 때 반영하면 됨.
+
+## 항목별 결과
+
+### 1. 블로그 회귀 — ✅
+- `git show HEAD:css/style.css` 1~37행과 `css/tokens.css`를 대조함.
+  - 색상 11개, `color-scheme`, `--font-sans`, `--font-mono`, `--radius`의 값이 라이트·다크 모두 한 글자도 다르지 않음.
+  - `git diff css/style.css`를 보면 추가된 줄은 주석 한 줄뿐이고, 나머지는 옮긴 변수를 지운 줄임. `--measure`, `--gutter`, `--header-height`는 style.css에 남아 있음.
+- 블로그 `index.html:21`에 tokens.css `<link>`가 style.css 바로 앞에 있음. `@import`는 없음.
+- 브라우저에서 계산된 값 확인
+  - 라이트: body 배경 `rgb(252,252,251)`, 글자 `rgb(29,33,37)`, `--accent #1f5bd8`
+  - 다크: body 배경 `rgb(23,25,29)`, 글자 `rgb(227,229,233)`, `--accent #7cafff`
+  - 모두 이전 값과 같음.
+- 메인(웹앱 카드 포함)과 글 상세(`#/post/til-2026-11-09`, `#/post/markdown-test`)를 라이트·다크로 캡처함. 코드 블록 배경(`#f2f2ee` / `#20242b`), 태그, 표가 정상으로 보임.
+- tokens.css는 200으로 받아짐. 블로그 페이지에서 콘솔 오류와 4xx는 0건.
+- 블로그 CSS의 `var(--x)` 참조와 정의(tokens.css + style.css)를 전부 대조함. 정의되지 않은 변수와 쓰이지 않는 변수 모두 0개.
+
+### 2. 앱 색상 — ✅
+- 계산된 값
+  - 라이트: `--accent #1f5bd8`, `--accent-hover #1a4db8`, `--on-accent #fff`, `--focus #1f5bd8`, `--ok #1e6b43`, `--ok-bg #e6f4ec`
+  - 다크: `--accent #7cafff`, `--accent-hover #a3c6ff`, `--on-accent #0e1a2e`, `--focus #7cafff`, `--ok #6fd39e`, `--ok-bg #173a29`
+- 스타일시트 순서: tokens.css → app.css → print.css(print). `../../css/tokens.css` 경로가 앱 루트에서 정상으로 불러와짐.
+- 초록 강조색 6개(`#1f7a4d` 등)와 아이콘의 `#2a9a62`를 앱 폴더 전체에서 grep함. 남은 것은 `app.css:36 --ok-bg #173a29`(다크 완료 상태색) 하나이고, 지침상 맞는 사용임.
+- `icon.svg`가 파랑(`#1f5bd8` / `#3a72e6`)으로 바뀜.
+- 대비 측정 결과(라이트 / 다크). 모두 4.5:1 이상.
+
+  | 요소 | 라이트 | 다크 |
+  |---|---|---|
+  | 기본 버튼 `.btn-primary` | 5.92 | 7.82 |
+  | 기본 버튼 hover(계산) | 7.51 | 10.02 |
+  | 탭 바 현재 탭, 모바일(surface-strong 배경) | 5.92 | 6.47 |
+  | 탭 바 현재 탭, 넓은 화면(accent-soft 배경) | 4.99 | 6.14 |
+  | 배지 완료 `.badge-ok` | 5.72 | 6.86 |
+  | 배지 진행 중 / 미착수 / 위험 | 5.38 / 6.09 / 4.92 | 9.13 / 6.76 / 6.56 |
+  | 선택된 선택지 라벨 | 12.76 | 9.69 |
+  | `.card-accent` 제목·본문 | 13.65 | 10.84 |
+  | 위험성 매트릭스 `.cell-ok` | 5.72 | 6.86 |
+  | 사용법 링크 `.touch-link`(카드 위) | 5.37 | 7.16 |
+
+- 완료 배지(초록)와 강조색(파랑)이 화면에서 구분됨.
+
+### 3. 테마 공유 — ✅
+OS를 라이트로 에뮬레이션하고, 앱 설정은 system인 상태에서 확인함.
+- 블로그에서 다크로 토글(`theme=dark`) → 앱을 열면 `data-theme=dark`.
+- 앱 헤더 버튼으로 토글(→ light) → `sz:settings.theme=light`와 블로그 `theme=light`가 함께 저장되고, 블로그를 열면 light.
+- 앱에서 다시 다크로 토글 → 블로그도 dark.
+- 더보기 '기기 설정 따르기' 선택 → 블로그 `theme` 키가 지워짐(`null`). 앱과 블로그 모두 OS 값(light)을 따름. OS를 다크로 바꾸면 앱도 dark.
+- 저장소를 쓸 수 없을 때
+  - 코드: `index.html` 인라인 스크립트의 두 읽기, `theme.js`의 `blogTheme`와 `saveBlogTheme`가 모두 try/catch 안에 있음.
+  - 실제로 `window.localStorage` 접근이 예외를 던지게 만들어 열어 봄. 홈이 정상으로 그려지고, 헤더 토글과 더보기 테마 선택도 동작함. 콘솔 오류는 0건.
+
+### 4. 사용법 안내 — ⚠ 동작은 통과, 접힌 상태 표시에 문제 1건(M1)
+- 진단 전에는 홈 두 번째 카드(card-accent 다음)에 `<details open>`으로 펼쳐짐.
+- 진단 후(`sz:profile.result` 있음)에는 `open=false`로 접힘. summary를 누르면 펼쳐짐.
+- 5단계 링크를 각각 눌러 이동한 화면
+
+  | 링크 | 이동한 hash | 화면 제목 | 탭 |
+  |---|---|---|---|
+  | 1 | `#/check` | 법 적용 자가진단 | 홈 |
+  | 2 | `#/duties` | 이행 체크리스트 | 체크리스트 |
+  | 3 | `#/risk` | 위험성평가 | 위험성평가 |
+  | 4 | `#/log` | TBM·점검 기록 | 기록 |
+  | 5 | `#/more` | 더보기 | 더보기 |
+
+- 링크 높이는 홈·더보기 모두 44px이고, summary 높이도 44px임.
+- 마지막 안내 "데이터는 이 브라우저에만 저장되므로 정기적으로 백업하세요."가 표시됨.
+- 더보기 두 번째 섹션 `#more-guide`의 단계 문구와 안내 문구가 홈과 글자 단위로 같음.
+- 문구는 `js/data/guide.js`에만 정의되어 있음. 마크업은 `home.js`의 `guideSteps()` 하나를 `more.js`가 import해서 씀.
+
+### 5. 모바일(375px) — ✅
+- 홈과 더보기를 라이트·다크로 확인함. `scrollWidth`가 375로 `clientWidth`와 같음.
+- 화면 밖으로 나가는 요소는 0개. 콘솔 오류도 0건.
+
+### 6. 인쇄 CSS — ✅(코드 확인), 참고 1건(N1)
+- `print.css:14 --accent #1f5bd8`, `:16 --accent-soft #e8eefb`(단색). 대비는 5.09.
+- 나머지 인쇄용 고정값은 그대로 유지됨.
+
+### 7. 코드 — ✅
+- `node --check`: `js/theme.js`, `js/views/home.js`, `js/views/more.js`, `js/data/guide.js` 모두 통과.
+- 앱의 `var(--x)` 참조(css·js·index.html)와 정의(tokens.css + app.css + print.css)를 전부 대조함. **정의되지 않은 변수는 0개**.
+- 앱 전용 변수 중 쓰이지 않는 것은 없음.
+  - tokens.css에서 오는 `--code-bg`, `--code-text`, `--header-bg`, `--selection`, `--font-mono`는 앱에서 쓰지 않음. 블로그가 쓰는 공용 팔레트라 문제 아님.
+  - `--code-bg`는 이전에도 앱에서 정의만 하고 쓰지 않던 변수임.
+- `home.js` ↔ `more.js` import에서 순환은 생기지 않음(home은 more를 import하지 않음).
+
+## 발견한 문제
+
+### M1. 진단 후 접힌 '사용법' 카드가 펼칠 수 있다는 표시 없이 빈 카드처럼 보임 — 중간
+- 위치: `css/app.css:794-801`(`.guide summary { display: flex; … }`), `js/views/home.js:75-81`
+- 원인: summary에 `display: flex`가 걸려 있어 브라우저 기본 펼침 삼각형(▶)이 사라짐. 위험성평가 화면용으로 원래 있던 규칙에 새 카드가 같은 `guide` 클래스로 들어가며 영향을 받음.
+- 재현
+  1. 자가진단을 마침.
+  2. 홈으로 감.
+  3. "사용법" 글자만 있는 카드가 보이고, 눌러서 펼칠 수 있다는 단서가 없음(데스크톱·모바일 모두).
+- 기능은 정상임. 누르면 펼쳐지고 키보드로도 동작함.
+- 제안: summary 앞에 ▸/▾ 표시를 붙이거나(`summary::before` + `details[open]`에서 회전), 오른쪽에 "펼치기" 보조 문구를 붙임.
+
+### N1. 다크 테마로 화면을 인쇄하면 완료 상태색이 어두운 초록 배경으로 나옴 — 낮음
+- 위치: `css/print.css:5-29`. 인쇄용 변수 블록에 `--ok`, `--ok-bg`가 없음.
+- 원인
+  - 예전에는 `--ok: var(--accent)`라서 print.css의 `--accent` 재정의를 따라 인쇄 때 밝은 색이 됐음.
+  - 이번에 `--ok`를 따로 두면서 인쇄 쪽 재정의가 빠짐.
+- 재현
+  1. 다크 테마에서 체크리스트에 '완료' 항목을 둠.
+  2. 브라우저 메뉴(Ctrl+P)로 인쇄 미리보기를 봄.
+  3. 이번에는 print 미디어 에뮬레이션으로 확인함. `.badge-ok`와 위험성 매트릭스 `.cell-ok`가 `#173a29` 바탕에 `#6fd39e` 글자로 나옴. 흰 종이 기준에 어긋나고 잉크를 많이 씀.
+- 앱의 '인쇄' 버튼으로 내는 `#print-area` 표 문서는 `--print-*` 값을 써서 영향 없음.
+- 제안: print.css 변수 블록에 `--ok: #1e6b43; --ok-bg: #e6f4ec;`를 추가함.
+
+### 참고 (지침 범위 밖)
+- 블로그 메인 웹앱 카드의 미리보기 `apps/safety-zone/preview.png`는 아직 초록 강조색 시절 화면임.
+- Build 지침에서 수정 금지 파일이라 이번 범위에서는 맞는 상태임. 다음 Embed 단계에서 다시 캡처하면 됨.
+
+## 확인하지 못한 항목
+- **블로그 픽셀 단위 비교**: 이전 버전을 띄우려면 작업 트리를 바꿔야 해서(git 명령 제한) 이전 화면과 겹쳐 보는 비교는 하지 않음. 대신 변수 값 전체 일치, style.css diff, 계산된 색, 스크린샷으로 확인함.
+- **실제 인쇄 미리보기와 처음부터 저장소가 막힌 시크릿 창**: 실제 미리보기 대신 print 미디어 에뮬레이션으로, 시크릿 창 대신 localStorage 접근이 예외를 던지게 바꾼 상태로 대신 확인함.
+- **실제 iOS/Android 기기**: 확인하지 않음. 375px 에뮬레이션으로 대신함.
+
+테스트 데이터는 임시 Edge 프로필에만 있었고, 프로젝트 파일과 사용자 브라우저에는 남기지 않음.
+
+---
+
+# 5차 검증 — M1·N1 수정 확인
+
+> 2026-11-09 · 대상: `briefs/fix-tokens.md`에 따른 수정(`css/app.css`, `css/print.css`).
+> - 이미 떠 있는 `http://localhost:8123/apps/safety-zone/`를 headless Edge로 열고, CDP 스크립트로 계산된 스타일·DOM·콘솔을 확인함. 화면은 스크린샷으로 확인함.
+> - 저장소에는 진단 완료 프로필(`sz:profile.result` 있음)과 위험성평가 1건을 넣음. 테스트 데이터는 임시 Edge 프로필에만 있었음.
+> - 코드 파일은 고치지 않았고, git은 `git diff`만 사용함.
+
+## 판정: **통과**
+
+M1·N1 모두 해결됨. 새로 생긴 문제 없음.
+
+## 항목별 결과
+
+### 1. 셰브론 표시와 회전 — ✅
+- 375px·1280px, 라이트·다크 4가지 조합에서 같은 결과가 나옴.
+- 확인한 summary 3종: 홈 '사용법'(`details.guide`), 위험성평가 상세 `#/risk/r1`의 '흔한 위험요인 예시 보기'(`.examples`), '평가 정보 수정'(`details.form-card`).
+- 접힘: `::after`가 8×8px 셰브론, `rotate(-45deg)`로 ▸ 방향.
+- 펼침: `rotate(45deg)`로 ▾ 방향. summary를 눌러 펼치면 바뀜.
+- summary 높이는 모두 44px 그대로임. 셰브론은 `margin-left:auto`로 오른쪽 끝에 붙음.
+- 375px에서 `scrollWidth`와 `clientWidth`가 같음(가로 넘침 없음).
+
+### 2. 기본 마커 중복 없음 — ✅
+- summary는 `display:flex`, `list-style:none`이고, `::marker`의 content는 `""`임. `::-webkit-details-marker`는 `display:none`(`app.css:806-816`).
+- `::before`는 `none`임. 표시는 `::after` 하나뿐임.
+- 스크린샷에서도 셰브론이 한 개만 보임.
+
+### 3. 색과 움직임 줄이기 — ✅
+- 셰브론 테두리색이 계산된 `var(--text-muted)`와 같음. 라이트는 `rgb(90,97,107)`, 다크는 `rgb(154,161,172)`(`app.css:828-829`).
+- 기본 전환은 `0.2s`임.
+- `prefers-reduced-motion: reduce`를 에뮬레이션하면 전환이 `0s`가 됨. 전용 규칙(`app.css:840-846`)과 전역 규칙(`app.css:1172-1180`)이 모두 적용됨.
+- 셰브론은 CSS 장식이라 summary 글자에 들어가지 않음.
+
+### 4. 인쇄 변수 — ✅
+- `print.css:21-22`에 `--ok: #1e6b43; --ok-bg: #e6f4ec;`가 추가됨. `:root, [data-theme="dark"]` 블록 안에 있음.
+- 다크 테마에서 print 미디어를 에뮬레이션해 계산값을 확인함. `--ok #1e6b43`, `--ok-bg #e6f4ec`로 라이트 값이 나옴.
+
+### 5. 콘솔 — ✅
+- 앱 화면에서 콘솔 오류, 예외, 4xx는 0건.
+- `/favicon.ico` 404가 한 번 기록됨. 테스트 스크립트가 저장소를 넣으려고 `/css/tokens.css`를 직접 연 탓에 생긴 것임. 앱과는 관계없음.
+
+## 발견한 문제
+- 없음.
+
+## 참고
+- 같은 선택자를 쓰는 `log.js:116`의 '위험성평가에서 불러오기'(`.examples`)에도 같은 셰브론이 붙음. 코드로만 확인함.
+- 이전에 적은 `preview.png` 재캡처 건은 아직 남아 있음(범위 밖).

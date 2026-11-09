@@ -1,5 +1,6 @@
 import { get } from '../store.js';
 import { DISCLAIMER_SHORT } from '../data/legal.js';
+import { GUIDE_STEPS, GUIDE_NOTE } from '../data/guide.js';
 import { h, pageHead, badge, progressBar, linkButton } from '../utils/dom.js';
 import { todayStr, formatKoreanDate } from '../utils/date.js';
 import { computeDutyStats } from './duties.js';
@@ -57,6 +58,28 @@ function todayCard() {
   );
 }
 
+// 사용 순서 목록. 더보기의 '사용법' 섹션도 이 함수를 씁니다.
+export function guideSteps() {
+  return [
+    h('ol', { class: 'plain-list' },
+      GUIDE_STEPS.map((step) => h('li', {},
+        h('strong', { text: step.title }), ` — ${step.desc} `,
+        h('a', { class: 'touch-link', href: step.href, text: step.link })
+      ))
+    ),
+    h('p', { class: 'small', text: GUIDE_NOTE })
+  ];
+}
+
+// 자가진단 전에는 펼쳐 두고, 진단 후에는 접어 둡니다.
+function guideCard() {
+  const checked = Boolean(get('profile')?.result);
+  return h('details', { class: 'card guide', open: !checked },
+    h('summary', { text: '사용법' }),
+    ...guideSteps()
+  );
+}
+
 function disclaimerNote() {
   return h('p', { class: 'disclaimer-note' }, DISCLAIMER_SHORT, ' ', h('a', { href: '#/more/disclaimer', text: '(자세히)' }));
 }
@@ -65,6 +88,7 @@ export function renderHome(root) {
   root.append(
     pageHead('오늘의 안전 현황'),
     profileCard(),
+    guideCard(),
     dutyCard(),
     todayCard(),
     disclaimerNote()

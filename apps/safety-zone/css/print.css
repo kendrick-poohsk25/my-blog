@@ -11,13 +11,15 @@
   --text-muted: #333333;
   --border: #bbbbbb;
   --border-strong: #888888;
-  --accent: #1f7a4d;
+  --accent: #1f5bd8;
   --on-accent: #ffffff;
-  --accent-soft: #e4f3ea;
+  --accent-soft: #e8eefb;
   --warn: #8a5a00;
   --warn-bg: #fff4cc;
   --danger: #c62828;
   --danger-bg: #fdecea;
+  --ok: #1e6b43;
+  --ok-bg: #e6f4ec;
   --info-bg: #eaf1f8;
   --info: #1d4f7a;
   --shadow: none;

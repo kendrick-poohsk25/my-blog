@@ -450,7 +450,7 @@ apps/safety-zone/
 ## 10. 검증 기준 (Review 체크리스트)
 
 **범위·제약**
-- [ ] 모든 파일이 `apps/safety-zone/` 안에 있고 블로그 파일(`css/style.css`, `js/*` 등)을 참조·수정하지 않음
+- [ ] 모든 파일이 `apps/safety-zone/` 안에 있고 블로그 파일(`css/style.css`, `js/*` 등)을 참조·수정하지 않음 — 예외: 블로그 공통 색상 토큰 `../../css/tokens.css`는 불러온다(2026-11-09 CLAUDE.md 규칙 추가에 따른 변경)
 - [ ] 빌드 없이 `python -m http.server`로 동작, 상대 경로만 사용
 - [ ] 외부 네트워크 요청 없음(개발자 도구 Network 탭 확인), 개인정보 외부 전송 없음
 

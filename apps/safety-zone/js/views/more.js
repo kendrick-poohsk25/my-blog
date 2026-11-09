@@ -8,6 +8,7 @@ import { downloadCsv, downloadJson, printReport } from '../utils/export.js';
 import { applyTheme, setThemeSetting } from '../theme.js';
 import { dutyState, nextDue, isOverdue } from './duties.js';
 import { kindLabel, checkLabel } from './log.js';
+import { guideSteps } from './home.js';
 
 const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
@@ -94,6 +95,10 @@ function section(id, title, ...children) {
     h('h2', { class: 'card-title', id: `more-${id}-title`, text: title }),
     ...children
   );
+}
+
+function guideSection() {
+  return section('guide', '사용법', ...guideSteps());
 }
 
 function profileSection() {
@@ -259,6 +264,7 @@ export function renderMore(root, params = {}) {
   };
   root.append(
     pageHead('더보기'),
+    guideSection(),
     profileSection(),
     exportSection(),
     backupSection(rerender),

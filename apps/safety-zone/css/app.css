@@ -1,58 +1,43 @@
 /* ========== 테마 변수 ========== */
+/* 공통 팔레트(bg, surface, text, text-muted, border, accent, accent-soft, code-bg, radius, 글꼴, color-scheme)는
+   블로그의 ../../css/tokens.css에서 옵니다. 여기에는 앱 전용 변수만 둡니다. */
 :root {
-  --bg: #fcfcfb;
-  --surface: #f4f4f1;
   --surface-strong: #ffffff;
-  --text: #1d2125;
-  --text-muted: #5a616b;
-  --border: #e3e3df;
   --border-strong: #c9c9c3;
-  --accent: #1f7a4d;
-  --accent-hover: #186340;
+  --accent-hover: #1a4db8;
   --on-accent: #ffffff;
-  --accent-soft: #e4f3ea;
   --warn: #8a5a00;
   --warn-bg: #fff4cc;
   --danger: #c62828;
   --danger-bg: #fdecea;
-  --ok: var(--accent);
-  --ok-bg: var(--accent-soft);
+  /* 완료 상태색: 강조색(파랑)과 구분되는 초록 */
+  --ok: #1e6b43;
+  --ok-bg: #e6f4ec;
   --info-bg: #eaf1f8;
   --info: #1d4f7a;
-  --code-bg: #efefeb;
-  --focus: #1f7a4d;
+  --focus: var(--accent);
   --overlay: rgba(20, 22, 26, 0.55);
   --shadow: 0 1px 2px rgba(20, 22, 26, 0.06);
-  --radius: 8px;
   --tabbar-h: 60px;
   --header-h: 56px;
-  --font: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  color-scheme: light;
+  --font: var(--font-sans);
 }
 
 [data-theme="dark"] {
-  --bg: #17191d;
-  --surface: #1f2228;
   --surface-strong: #262a31;
-  --text: #e3e5e9;
-  --text-muted: #9aa1ac;
-  --border: #2e323a;
   --border-strong: #464b55;
-  --accent: #5fd39a;
-  --accent-hover: #7fe0b0;
-  --on-accent: #0f2219;
-  --accent-soft: #173a29;
+  --accent-hover: #a3c6ff;
+  --on-accent: #0e1a2e;
   --warn: #ffd54a;
   --warn-bg: #3a3112;
   --danger: #ff8a80;
   --danger-bg: #3b1f1f;
+  --ok: #6fd39e;
+  --ok-bg: #173a29;
   --info-bg: #1b2a3a;
   --info: #9cc8f0;
-  --code-bg: #262a31;
-  --focus: #5fd39a;
   --overlay: rgba(0, 0, 0, 0.65);
   --shadow: none;
-  color-scheme: dark;
 }
 
 /* ========== 기본 ========== */
@@ -734,6 +719,11 @@ textarea {
   background: var(--accent-soft);
 }
 
+/* 반투명 accent-soft 위에서는 다크 모드 보조 글자 대비가 4.5:1에 못 미쳐 본문색을 씁니다. */
+.choice:has(input:checked) .choice-desc {
+  color: var(--text);
+}
+
 .choice:has(input:focus-visible) {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
@@ -809,6 +799,50 @@ details.form-card summary {
   align-items: center;
   font-weight: 600;
   cursor: pointer;
+  list-style: none;
+}
+
+/* 기본 삼각형 마커는 숨기고 아래 셰브론 하나만 보이게 합니다. */
+.guide summary::-webkit-details-marker,
+.examples summary::-webkit-details-marker,
+details.form-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide summary::marker,
+.examples summary::marker,
+details.form-card summary::marker {
+  content: "";
+}
+
+/* 펼침 표시(장식): 테두리로 그린 셰브론. 접힘 ▸, 펼침 ▾ */
+.guide summary::after,
+.examples summary::after,
+details.form-card summary::after {
+  content: "";
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: auto;
+  margin-right: 4px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+.guide[open] > summary::after,
+.examples[open] > summary::after,
+details.form-card[open] > summary::after {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide summary::after,
+  .examples summary::after,
+  details.form-card summary::after {
+    transition: none;
+  }
 }
 
 .table-wrap {
