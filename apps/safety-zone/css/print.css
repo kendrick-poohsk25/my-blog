@@ -1,0 +1,131 @@
+/* 인쇄 규칙
+   - 앱의 '인쇄' 버튼(body.printing-report): #print-area의 표 문서만 인쇄합니다.
+   - 브라우저 메뉴(Ctrl+P)로 직접 인쇄: 현재 화면을 인쇄하되 탭 바·버튼 같은 UI만 숨깁니다. */
+/* 인쇄는 테마와 상관없이 흰 종이 기준 색을 씁니다. 화면용 변수도 라이트 값으로 되돌립니다. */
+:root,
+[data-theme="dark"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --text: #000000;
+  --text-muted: #333333;
+  --border: #bbbbbb;
+  --border-strong: #888888;
+  --accent: #1f7a4d;
+  --on-accent: #ffffff;
+  --accent-soft: #e4f3ea;
+  --warn: #8a5a00;
+  --warn-bg: #fff4cc;
+  --danger: #c62828;
+  --danger-bg: #fdecea;
+  --info-bg: #eaf1f8;
+  --info: #1d4f7a;
+  --shadow: none;
+  --print-bg: #ffffff;
+  --print-text: #000000;
+  --print-muted: #333333;
+  --print-line: #555555;
+  --print-head-bg: #eeeeee;
+}
+
+@page {
+  size: A4 landscape;
+  margin: 12mm;
+}
+
+html,
+body {
+  background: var(--print-bg) !important;
+  color: var(--print-text) !important;
+}
+
+/* 직접 인쇄할 때 숨길 UI */
+.skip-link,
+.tabbar,
+.header-actions,
+.storage-banner,
+.toast,
+.dialog,
+.print-area,
+.danger-zone,
+.btn,
+.chip-remove,
+.back-link {
+  display: none !important;
+}
+
+.layout {
+  display: block !important;
+}
+
+.app-header {
+  position: static !important;
+}
+
+.view {
+  max-width: none !important;
+  padding: 0 !important;
+  animation: none !important;
+}
+
+/* 앱 버튼으로 인쇄할 때는 표 문서만 */
+body.printing-report > *:not(#print-area) {
+  display: none !important;
+}
+
+body.printing-report #print-area {
+  display: block !important;
+}
+
+#print-area {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-size: 9.5pt;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.print-header h1 {
+  margin: 0 0 4px;
+  font-size: 15pt;
+}
+
+.print-header p {
+  margin: 0 0 10px;
+  color: var(--print-muted);
+}
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.print-table thead {
+  display: table-header-group;
+}
+
+.print-table th,
+.print-table td {
+  padding: 4px 6px;
+  border: 1px solid var(--print-line);
+  vertical-align: top;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.print-table th {
+  background: var(--print-head-bg);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.print-table tr {
+  break-inside: avoid;
+}
+
+.print-footer {
+  margin-top: 12px;
+  padding-top: 6px;
+  border-top: 1px solid var(--print-line);
+  font-size: 8.5pt;
+  color: var(--print-muted);
+}

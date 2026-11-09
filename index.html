@@ -8,13 +8,13 @@
   <title>나의 블로그</title>
   <link rel="icon" href="data:,">
   <script>
-    // 화면이 그려지기 전에 테마를 정해 깜빡임을 막는다
+    // 첫 화면이 그려지기 전에 테마를 정해야 밝은 화면이 번쩍이지 않는다
     (function () {
-      var theme;
-      try { theme = localStorage.getItem('theme'); } catch (e) { theme = null; }
-      if (theme !== 'light' && theme !== 'dark') {
-        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      var theme = saved === 'light' || saved === 'dark'
+        ? saved
+        : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
@@ -24,9 +24,9 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="container header-inner">
+    <div class="container site-header-inner">
       <a class="site-title" href="#/">나의 블로그</a>
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="다크 모드로 전환">
+      <button id="theme-toggle" class="icon-button" type="button" aria-label="다크 모드로 전환">
         <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
         </svg>
@@ -38,8 +38,25 @@
     </div>
   </header>
 
+  <section id="apps" class="container apps-section" aria-labelledby="apps-title" hidden>
+    <h2 id="apps-title" class="apps-title">웹앱</h2>
+    <ul class="app-list">
+      <li class="app-card">
+        <a class="app-card-link" href="apps/safety-zone/">
+          <img class="app-card-image" src="apps/safety-zone/preview.png" width="1350" height="710" loading="lazy"
+            alt="안전지대 앱 홈 화면: 중대재해처벌법 적용 여부와 관리체계 이행률 56%">
+          <span class="app-card-body">
+            <span class="app-card-name">안전지대</span>
+            <span class="app-card-desc">작은 사업장을 위한 중대재해 예방 도우미 — 법 적용 자가진단, 관리체계 체크리스트, 위험성평가, TBM 기록을 브라우저에서.</span>
+            <span class="app-card-meta">웹앱 · 산업안전 · HTML/CSS/JS</span>
+          </span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
   <main id="app" class="container" tabindex="-1">
-    <p class="status">불러오는 중…</p>
+    <p class="muted">불러오는 중…</p>
   </main>
 
   <footer class="site-footer">
@@ -47,7 +64,7 @@
   </footer>
 
   <noscript>
-    <p class="container status">이 블로그는 JavaScript가 켜져 있어야 볼 수 있습니다.</p>
+    <p class="container muted">이 블로그는 JavaScript가 켜져 있어야 볼 수 있습니다.</p>
   </noscript>
 </body>
 </html>

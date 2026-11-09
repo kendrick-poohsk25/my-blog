@@ -1,41 +1,41 @@
-// 다크 모드 토글: 기본은 OS 설정, 사용자가 고르면 localStorage에 기억한다
-const STORAGE_KEY = 'theme';
+// 다크 모드: 처음에는 OS 설정을 따르고, 버튼으로 고르면 그 선택을 기억한다
+const KEY = 'theme';
 const root = document.documentElement;
-const button = document.getElementById('theme-toggle');
-const media = window.matchMedia('(prefers-color-scheme: dark)');
+const toggle = document.getElementById('theme-toggle');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
 
-function readStored() {
+function savedTheme() {
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    return localStorage.getItem(KEY);
   } catch {
     return null;
   }
 }
 
-function store(theme) {
+function saveTheme(theme) {
   try {
-    localStorage.setItem(STORAGE_KEY, theme);
+    localStorage.setItem(KEY, theme);
   } catch {
-    // 시크릿 모드 등 저장할 수 없는 환경에서는 이번 방문 동안만 적용된다
+    // 저장할 수 없는 환경(시크릿 창 등)에서는 이번 방문 동안만 적용된다
   }
 }
 
-function apply(theme) {
+function setTheme(theme) {
   root.dataset.theme = theme;
   const label = theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환';
-  button.setAttribute('aria-label', label);
-  button.title = label;
+  toggle.setAttribute('aria-label', label);
+  toggle.title = label;
 }
 
-apply(root.dataset.theme === 'dark' ? 'dark' : 'light');
+setTheme(root.dataset.theme === 'dark' ? 'dark' : 'light');
 
-button.addEventListener('click', () => {
+toggle.addEventListener('click', () => {
   const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  apply(next);
-  store(next);
+  setTheme(next);
+  saveTheme(next);
 });
 
-// 사용자가 직접 고른 적이 없으면 OS 설정 변경을 그대로 따라간다
-media.addEventListener('change', (event) => {
-  if (!readStored()) apply(event.matches ? 'dark' : 'light');
+// 직접 고른 적이 없을 때만 OS 설정 변화를 따라간다
+prefersDark.addEventListener('change', (event) => {
+  if (!savedTheme()) setTheme(event.matches ? 'dark' : 'light');
 });
